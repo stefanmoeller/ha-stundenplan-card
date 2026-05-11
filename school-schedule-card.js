@@ -1,5 +1,5 @@
 const CARD_TYPE = "school-schedule-card";
-const CARD_VERSION = "1.0.0";
+const CARD_VERSION = "1.0.1";
 const DEFAULT_CONFIG = {
   mode: "today",
   title: "Stundenplan",
@@ -86,6 +86,9 @@ class SchoolScheduleCard extends HTMLElement {
           --mdc-icon-size: 16px;
           width: 16px;
           height: 16px;
+          display: block;
+          line-height: 1;
+          transform: translateY(-0.5px);
         }
         .empty {
           padding: 10px;
@@ -120,12 +123,17 @@ class SchoolScheduleCard extends HTMLElement {
           justify-content: center;
           background: var(--subject-color);
           overflow: hidden;
+          line-height: 0;
+          flex: 0 0 auto;
         }
         .icon-circle ha-icon {
           --mdc-icon-size: 18px;
           width: 18px;
           height: 18px;
           color: white;
+          display: block;
+          line-height: 1;
+          transform: translateY(-0.5px);
         }
         .lesson-name {
           font-weight: 600;
@@ -153,18 +161,24 @@ class SchoolScheduleCard extends HTMLElement {
           font-size: 0.9rem;
           width: 125px;
         }
-        .cell-subject {
+        .cell-pill {
+          --subject-color: var(--primary-color);
           display: inline-flex;
           align-items: center;
-          gap: 6px;
+          gap: 8px;
           max-width: 100%;
+          border-radius: 999px;
+          background: color-mix(in srgb, var(--subject-color) 30%, var(--card-background-color));
+          color: var(--primary-text-color);
+          overflow: hidden;
+          padding: 3px 9px 3px 3px;
         }
-        .cell-subject .icon-circle {
+        .cell-pill .icon-circle {
           width: 22px;
           height: 22px;
           min-width: 22px;
         }
-        .cell-subject .icon-circle ha-icon {
+        .cell-pill .icon-circle ha-icon {
           --mdc-icon-size: 14px;
           width: 14px;
           height: 14px;
@@ -278,7 +292,7 @@ class SchoolScheduleCard extends HTMLElement {
     const icon = this.escape(lesson.icon || "mdi:book-open-page-variant");
     const subject = this.escape(lesson.subject || "");
     return `
-      <span class="cell-subject">
+      <span class="cell-pill" style="--subject-color:${color}">
         <span class="icon-circle" style="--subject-color:${color}"><ha-icon icon="${icon}"></ha-icon></span>
         <span>${subject}</span>
       </span>
