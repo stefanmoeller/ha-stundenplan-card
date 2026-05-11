@@ -2,6 +2,8 @@
 
 Custom Lovelace card for the `Stundenplan` integration.
 
+Current card version: `0.2.0`
+
 ## Features
 
 - `today` view: weekday + school end + subject list
@@ -12,6 +14,11 @@ Custom Lovelace card for the `Stundenplan` integration.
 ## Installation (HACS)
 
 Add this repository as a **Dashboard** repository in HACS and install the card.
+
+Prerequisite:
+
+- Install the integration first:
+  https://github.com/stefanmoeller/ha-stundenplan
 
 Then add resource:
 
