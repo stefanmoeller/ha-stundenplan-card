@@ -2,7 +2,7 @@
 
 Custom Lovelace card for the `Stundenplan` integration.
 
-Current card version: `0.2.0`
+Current card version: `0.2.1`
 
 ## Features
 
@@ -19,6 +19,12 @@ Prerequisite:
 
 - Install the integration first:
   https://github.com/stefanmoeller/ha-stundenplan
+- Recommended integration version: `0.2.3` or newer
+
+Compatibility:
+
+- The card relies on the stable attributes from `ha-stundenplan`.
+- Integration and card are versioned independently and can be updated separately.
 
 Then add resource:
 
