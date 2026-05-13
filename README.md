@@ -2,7 +2,7 @@
 
 Custom Lovelace card for the `Stundenplan` integration.
 
-Current card version: `0.2.1`
+Current card version: `0.3.0`
 
 ## Features
 
