@@ -1,11 +1,11 @@
 const CARD_TYPE = "school-schedule-card";
-const CARD_VERSION = "0.3.0";
+const CARD_VERSION = "0.3.1";
 const DEFAULT_CONFIG = {
   mode: "today",
   title: "Stundenplan",
   show_title: true,
 };
-const SUPPORTED_MODES = new Set(["today", "table"]);
+const SUPPORTED_MODES = new Set(["today", "compact_today", "table"]);
 
 class SchoolScheduleCard extends HTMLElement {
   static getStubConfig(hass) {
@@ -32,7 +32,10 @@ class SchoolScheduleCard extends HTMLElement {
   }
 
   getCardSize() {
-    return this.config?.mode === "table" ? 6 : 4;
+    if (this.config?.mode === "table") {
+      return 6;
+    }
+    return this.config?.mode === "compact_today" ? 3 : 4;
   }
 
   navigate() {
@@ -61,6 +64,7 @@ class SchoolScheduleCard extends HTMLElement {
         ${this.config.show_title !== false && this.config.title ? `<div class="card-header">${this.escape(this.config.title)}</div>` : ""}
         <div class="card-content">
           ${mode === "today" ? this.renderToday(state) : ""}
+          ${mode === "compact_today" ? this.renderCompactToday(state) : ""}
           ${mode === "table" ? this.renderTable(state) : ""}
           ${!SUPPORTED_MODES.has(mode) ? `<div class="empty">Unknown mode: ${this.escape(mode)}</div>` : ""}
         </div>
@@ -75,6 +79,86 @@ class SchoolScheduleCard extends HTMLElement {
           margin-bottom: 12px;
         }
         .headline { font-size: 1.1rem; font-weight: 650; }
+        .compact-today {
+          border-radius: 8px;
+          overflow: hidden;
+          background: var(--secondary-background-color);
+          border: 1px solid color-mix(in srgb, var(--divider-color) 75%, transparent);
+        }
+        .compact-header {
+          display: grid;
+          grid-template-columns: auto minmax(0, 1fr) auto;
+          align-items: center;
+          gap: 10px;
+          padding: 12px 12px 10px;
+        }
+        .compact-list {
+          background: color-mix(in srgb, var(--card-background-color) 14%, transparent);
+        }
+        .compact-calendar {
+          color: var(--secondary-text-color);
+          --mdc-icon-size: 23px;
+          width: 23px;
+          height: 23px;
+          display: block;
+        }
+        .compact-title {
+          display: inline-flex;
+          align-items: baseline;
+          min-width: 0;
+          gap: 8px;
+        }
+        .compact-weekday {
+          font-size: 1.1rem;
+          font-weight: 650;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        .compact-today-label {
+          color: var(--secondary-text-color);
+          font-size: 0.8rem;
+          white-space: nowrap;
+        }
+        .compact-end {
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          color: var(--secondary-text-color);
+          white-space: nowrap;
+        }
+        .compact-end ha-icon {
+          --mdc-icon-size: 16px;
+          width: 16px;
+          height: 16px;
+          display: block;
+        }
+        .compact-row {
+          --subject-color: var(--primary-color);
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) auto;
+          align-items: center;
+          gap: 12px;
+          min-height: 36px;
+          padding: 0 12px;
+          border-bottom: 1px solid color-mix(in srgb, var(--divider-color) 65%, transparent);
+        }
+        .compact-row:last-child {
+          border-bottom: 0;
+        }
+        .compact-subject {
+          font-weight: 500;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        .compact-dot {
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          background: var(--subject-color);
+          box-shadow: 0 0 0 1px color-mix(in srgb, var(--card-background-color) 45%, transparent);
+        }
         .subline {
           color: var(--secondary-text-color);
           white-space: nowrap;
@@ -231,6 +315,74 @@ class SchoolScheduleCard extends HTMLElement {
       </div>
       <div class="lesson-list">
         ${lessons.map((lesson) => this.renderLessonPill(lesson)).join("")}
+      </div>
+    `;
+  }
+
+  renderCompactToday(state) {
+    const a = state.attributes || {};
+    const weekday = a.weekday_name || "Heute";
+    const schoolEnd = a.school_end || "-";
+    const lessons = a.lessons || [];
+
+    if (a.is_free_day) {
+      return `
+        <div class="compact-today">
+          ${this.renderCompactHeader(weekday, schoolEnd)}
+          <div class="compact-list">
+            <div class="compact-row">
+              <span class="compact-subject">Schulfrei${a.free_reason ? `: ${this.escape(a.free_reason)}` : ""}</span>
+              <span class="compact-dot" style="--subject-color:var(--secondary-text-color)"></span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    if (!a.is_school_day || !lessons.length) {
+      return `
+        <div class="compact-today">
+          ${this.renderCompactHeader(weekday, schoolEnd)}
+          <div class="compact-list">
+            <div class="compact-row">
+              <span class="compact-subject">Keine Stunden</span>
+              <span class="compact-dot" style="--subject-color:var(--secondary-text-color)"></span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    return `
+      <div class="compact-today">
+        ${this.renderCompactHeader(weekday, schoolEnd)}
+        <div class="compact-list">
+          ${lessons.map((lesson) => this.renderCompactLesson(lesson)).join("")}
+        </div>
+      </div>
+    `;
+  }
+
+  renderCompactHeader(weekday, schoolEnd) {
+    return `
+      <div class="compact-header">
+        <ha-icon class="compact-calendar" icon="mdi:calendar-blank-outline"></ha-icon>
+        <div class="compact-title">
+          <span class="compact-weekday">${this.escape(weekday)}</span>
+          <span class="compact-today-label">Heute</span>
+        </div>
+        <div class="compact-end"><ha-icon icon="mdi:clock-check-outline"></ha-icon><span>${this.escape(schoolEnd)}</span></div>
+      </div>
+    `;
+  }
+
+  renderCompactLesson(lesson) {
+    const color = this.cssValue(lesson.color || "var(--primary-color)");
+    const subject = this.escape(lesson.subject || "");
+    return `
+      <div class="compact-row" style="--subject-color:${color}">
+        <span class="compact-subject">${subject}</span>
+        <span class="compact-dot"></span>
       </div>
     `;
   }

@@ -2,11 +2,12 @@
 
 Custom Lovelace card for the `Stundenplan` integration.
 
-Current card version: `0.3.0`
+Current card version: `0.3.1`
 
 ## Features
 
 - `today` view: weekday + school end + subject list
+- `compact_today` view: compact today list with subject color dots
 - `table` view: weekly table with time column
 - optional card title
 - optional tap navigation
@@ -41,6 +42,15 @@ entity: sensor.stundenplan_fritz
 mode: today
 title: Stundenplan
 show_title: true
+```
+
+### Compact today mode
+
+```yaml
+type: custom:school-schedule-card
+entity: sensor.stundenplan_fritz
+mode: compact_today
+show_title: false
 ```
 
 ### Week table mode
