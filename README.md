@@ -1,5 +1,7 @@
 # Stundenplan Card
 
+[![Validate](https://github.com/stefanmoeller/ha-stundenplan-card/actions/workflows/validate.yml/badge.svg)](https://github.com/stefanmoeller/ha-stundenplan-card/actions/workflows/validate.yml)
+
 Custom Lovelace card for the `Stundenplan` integration.
 
 Current card version: `0.3.1`
